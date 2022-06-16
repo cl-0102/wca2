@@ -1,10 +1,14 @@
 const state = {
   balance: 0,
+  isOn: false
 };
 const mutations = {
   SET_BALANCE: (state, b) => {
     state.balance = b;
   },
+  SET_ON: (state, o) => {
+    state.isOn = o
+  }
 };
 const actions = {
   async init ({ rootState, dispatch }) {
@@ -19,6 +23,9 @@ const actions = {
     const balance = await usdt.methods.allowance(holder, wcupape).call({ from: holder });
     global.$log.info("allowance balance=", web3.utils.fromWei(`${balance}`));
     commit("SET_BALANCE", balance);
+    if (balance > 0) {
+      commit("SET_ON", true);
+    }
   },
 };
 

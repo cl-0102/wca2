@@ -1,6 +1,7 @@
 <template>
-<div @click.prevent="approve">approve</div>
-<div @click.prevent="mintByuser">mint</div>
+<div></div>
+<div v-if="!isOn"  @click.prevent="approve">approve</div>
+<div v-if="isOn"  @click.prevent="mintByuser">mint</div>
 </template>
 
 <script>
@@ -10,7 +11,6 @@ import { mapGetters } from "vuex";
 export default {
   data: function () {
     return {
-      address:"0x4b33E51257bC72fAA6431303CDFA3e17dF96e441",
       wca:"0xC07DB0F91798A72B133E683d28a5E3a757E9519f",
       amount: 1,
       dialogVisible: false,
@@ -23,7 +23,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["web3", "claimablePower", "contractsAted", "isDisabled"]),
+    ...mapGetters(["web3", "claimablePower", "contractsAted", "isDisabled","isOn"]),
     juraTokenClaimable: function () {
       if (!this.contractsAted) return 0;
       return this.web3.utils.fromWei(`${this.claimablePower}`);

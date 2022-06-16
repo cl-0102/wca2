@@ -67,9 +67,9 @@ const actions = {
     // const neddAllowance = parseFloat(web3.utils.fromWei(`${800000}`))
     // console.log("neddAllowance", neddAllowance);
 
-    if (1000 > allowance) {
-      return Promise.reject(`you had no enough coin, need 1000`)
-    }
+    // if (1000 > allowance) {
+    //   return Promise.reject(`you had no enough coin, need 1000`)
+    // }
 
     return await wcupnft.methods.mintByUser(amount).send({ from: sender }, (err, txHash) => {
       console.log(err, txHash)

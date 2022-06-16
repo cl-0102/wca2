@@ -9,6 +9,7 @@ const getters = {
   // isDisabled: (state) => state.juranft.isDisabled
   totalSupply: (state) => state.juranft.totalSupply,
   maxSupply: (state) => state.juranft.maxSupply,
+  isOn: (state) => state.allowance.isOn
 };
 
 export default getters;
