@@ -141,11 +141,11 @@ const actions = {
       global.$log.debug("finish wallet connect");
 
       await dispatch("chainNetwork");
-      if (state.connectStatusId == 5) {
-        return Promise.reject(
-          `please change chain network from ${state.network} to ${state.networkSpec}`
-        );
-      }
+      // if (state.connectStatusId == 5) {
+      //   return Promise.reject(
+      //     `please change chain network from ${state.network} to ${state.networkSpec}`
+      //   );
+      // }
       await dispatch("coinBase");
       if (state.connectStatusId != 7) {
         return Promise.reject(
