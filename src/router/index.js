@@ -10,7 +10,7 @@ const routes = [
   // {
   //   path: '/mint',
   //   name: 'Mint',
-  //   component: () => import( '../views/Mint.vue')
+  //   component: () => import('../views/Mint.vue')
   // }
 ]
 

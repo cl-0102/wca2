@@ -41,7 +41,7 @@ const mutations = {
 const actions = {
   async init ({ rootState, dispatch }) {
     if (!rootState.web3s.contractsAted) return;
-    // await dispatch("allowance/init", {}, { root: true });
+    await dispatch("allowance/init", {}, { root: true });
     // await dispatch("getAllowance");
   },
 

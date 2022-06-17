@@ -449,7 +449,7 @@ export default {
       "maxSupply"
     ]),
     walletAddress() {
-      // console.log(addressShorter)
+      console.log(addressShorter)
       return addressShorter(this.addressOfEth);
     },
     remainSupply() {

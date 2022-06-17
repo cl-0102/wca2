@@ -1,5 +1,39 @@
 <template>
   <div class="hidden md:block get w-full overflow-hidden h-[1080px]">
+    <div
+      class="w-full mt-[15px] max-w-[1200px] mx-auto h-[51px] leading-[51px] flex overflow-hidden"
+    >
+      <div>
+        <img class="mt-[13px]" src="../assets/pc/logo.png" alt />
+      </div>
+      <div class="flex t text-white text-[12px] w-[340px] ml-[45px] justify-between mr-auto">
+        <div>{{ $t("a1") }}</div>
+        <div>{{ $t("a2") }}</div>
+        <div>{{ $t("a3") }}</div>
+        <div>{{ $t("a4") }}</div>
+      </div>
+      <a href="https://twitter.com/worldcupape" target="_blank">
+        <div class="cursor-pointer mt-[19px] mr-[28px]">
+          <img src="../assets/pc/twitter.png" alt />
+        </div>
+      </a>
+      <a href="https://t.co/19yg4bf0Nw" target="_blank">
+        <div class="cursor-pointer mt-[19px] mr-[28px]">
+          <img src="../assets/pc/discord.png" alt />
+        </div>
+      </a>
+      <div class="text-white mr-[20px] cursor-pointer" @click="changeLang">{{ state ? "EN" : "中文" }}</div>
+      <div
+        v-if="!contractsAted"
+        class="wallet w-[111px] h-[51px] text-white text-xs leading-[51px] text-center"
+        @click="getProvider"
+      >{{ $t("a37") }}</div>
+      <div
+        v-if="contractsAted"
+        class="wallet w-[111px] h-[51px] text-white text-xs leading-[51px] text-center"
+      >{{ walletAddress }}</div>
+    </div>
+
     <div class="w-full max-w-[1200px] mx-auto mt-[131px]">
       <img src="../assets/pc/get-title.png" alt />
       <div class="flex mt-[76px]">
@@ -48,11 +82,18 @@
               @click.prevent="approve"
               class="buy-bg text-[14px] cursor-pointer w-[225px] h-[83px] leading-[83px] text-center"
             >APPROVE</div>
-            <div
+            <!-- <div
               v-if="isOn"
               @click.prevent="mintByuser"
+              class="buy-bg text-[14px] cursor-pointer w-[225px] h-[83px] leading-[83px] text-center" 
+            >BUY</div>-->
+            <div
+              v-if="isOn"
               class="buy-bg text-[14px] cursor-pointer w-[225px] h-[83px] leading-[83px] text-center"
-            >BUY</div>
+            >
+              <el-button @click.prevent="mintByuser" :loading="loading">BUY</el-button>
+            </div>
+
             <div
               class="opensea-bg cursor-pointer w-[225px] h-[83px] text-[#00FFFF] text-center leading-[83px]"
             >Opensea</div>
@@ -130,15 +171,22 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { ElMessage } from "element-plus";
+import { addressShorter } from "../utils/address_util";
 export default {
   data() {
     return {
       wca: "0xC07DB0F91798A72B133E683d28a5E3a757E9519f",
       amount: 1,
+      loading: false,
     };
   },
   computed: {
-    ...mapGetters(["web3", "claimablePower", "contractsAted", "isDisabled", "isOn"]),
+    ...mapGetters(["web3", "contractsAted", "addressOfEth", "isDisabled", "isOn"]),
+    walletAddress() {
+      console.log(addressShorter)
+      return addressShorter(this.addressOfEth);
+    },
   },
   methods: {
     approve: async function () {
@@ -146,14 +194,58 @@ export default {
       console.log("had approve");
     },
     mintByuser: async function () {
+      if (!this.contractsAted) {
+        ElMessage.info("Please Connect Wallet");
+        return;
+      }
+      this.loading = true;
       await this.$store.dispatch("wCupApe/mintByUser", { amount: this.amount }, { root: true })
-      console.log("had mint");
+        .then((info) => {
+          this.$log.info(info);
+          this.loading = false;
+          ElMessage.success("success");
+        })
+        .catch((e) => {
+          this.loading = false;
+          this.$log.info(e);
+          if (!!e.code) {
+            if (e.code == 4001) {
+              ElMessage.info("you rejected");
+              return;
+            }
+          } else {
+            if (
+              typeof e == "string" &&
+              e.startsWith("you had no enough coin")
+            ) {
+              ElMessage.warning(e);
+              return;
+            } else if (typeof e == "string" && e.startsWith("had finish")) {
+              ElMessage.warning(e);
+              return;
+            }
+          }
+          ElMessage.warning("transaction is not successful");
+        });
     },
     sAmount: function (a) {
       this.amount = a;
     },
+    changeLang() {
+      this.state = !this.state;
+      this.$i18n.locale = this.$i18n.locale === "zh" ? "en" : "zh";
+      localStorage.setItem("lang", this.$i18n.locale);
+    },
+    async getProvider() {
+      this.$store.dispatch("web3s/init");
+    },
   },
   mounted() {
+    const localLang = localStorage.getItem("lang");
+    if (localLang) {
+      this.state = localLang === "en" ? true : false;
+      this.$i18n.locale = localLang;
+    }
   }
 };
 </script>
@@ -194,5 +286,21 @@ export default {
 .mopen {
   background-image: url("../assets/pc/opensea.png");
   background-size: cover;
+}
+.wallet {
+  background-image: url("../assets/pc/wallet.png");
+  background-size: cover;
+}
+.buy-bg >>> .el-button {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0c1104;
+  width: 225px;
+  height: 83px;
+  background: transparent;
+  border: none;
+}
+.buy-bg >>> .el-button.is-loading:before {
+  background-color: transparent;
 }
 </style>
